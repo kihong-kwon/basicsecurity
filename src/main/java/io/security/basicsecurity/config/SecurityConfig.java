@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -77,5 +78,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .tokenValiditySeconds(3600)
                 .alwaysRemember(false)
                 .userDetailsService(userDetailsService);
+
+        http.sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionFixation().none() // default (none, migrateSession, newSession)
+                .maximumSessions(1) // 동시 세션 유저수
+                .maxSessionsPreventsLogin(false) // true: 중복 로그인 거부 false: 기존 로그인 세션만료
+                .expiredUrl("/expired")
+                .and()
+                .invalidSessionUrl("/invalid"); // expiredUrl 보다 우선됨
     }
 }
